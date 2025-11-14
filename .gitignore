@@ -1,0 +1,38 @@
+# .NET e Visual Studio
+## Ignore saídas de build
+**/[Bb]in/
+**/[Oo]bj/
+
+## Ignore arquivos do Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore arquivos de configuração local e segredos
+appsettings.Development.json
+appsettings.*.json
+!appsettings.Template.json
+secrets.json
+*.secrets.json
+
+## Ignore diretório de pacotes NuGet (para estilos de projeto mais antigos)
+**/packages/
+
+## Ignore arquivos de resultados de teste
+*.trx
+TestResults/
+
+## Outros
+*.log
+*.nupkg
+
+# Arquivos de sistema operacional
+## Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## macOS
+.DS_Store
