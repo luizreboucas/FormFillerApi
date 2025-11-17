@@ -94,7 +94,7 @@ namespace FormFiller.Presentation.Controllers
                     updatedUser.Phone ?? string.Empty
                 );
 
-                return Ok(dto);
+                return Ok(new ApiResponse(true, "Usuário atualizado com sucesso.", dto));
             }
             catch (Exception ex)
         {
