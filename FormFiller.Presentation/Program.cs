@@ -2,6 +2,7 @@ using FormFiller.Application.UseCases;
 using FormFiller.Domain.Interfaces;
 using FormFiller.Infrasctructure.Repositories;
 using FormFiller.Presentation;
+using FormFiller.Presentation.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserUseCases>();
+builder.Services.AddScoped<UserCreateValidator>();
+builder.Services.AddScoped<UserUpdateValidator>();
 builder.Services.ConfigureDb(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

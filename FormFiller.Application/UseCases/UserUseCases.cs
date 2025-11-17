@@ -8,6 +8,7 @@ using FormFiller.Domain.Entities;
 using FormFiller.Domain.Interfaces;
 using FormFiller.Application.Exceptions;
 using FluentValidation;
+using FormFiller.Application.UseCases.Models;
 
 namespace FormFiller.Application.UseCases
 {
@@ -18,22 +19,35 @@ namespace FormFiller.Application.UseCases
         {
             userRepository = repository;
         }
-        public async Task<User> CreateUserUc(User user, AbstractValidator<User> validator)
+        public async Task<UserCreateResponse> CreateUserUc(UserCreateRequest newUser)
         {
-            var thisUserIsAlreadyInTheDb = await userRepository.GetByEmail(user.Email);
+            var thisUserIsAlreadyInTheDb = await userRepository.GetByEmail(newUser.Email);
             if(thisUserIsAlreadyInTheDb != null) throw new AlreadyInTheDatabase("Já existe um usuário cadastrado com esse email.");
-            var userData = await validator.ValidateAsync(user);
-            if (!userData.IsValid) throw new ValidationException(userData.Errors);
+            var user = new User
+            {
+                Username = newUser.Username,
+                Email = newUser.Email,
+                PasswordHash = newUser.Password,
+                Phone = newUser.Phone
+            };
             var createdUser = await userRepository.Create(user);
-            return createdUser;
+            return new UserCreateResponse(createdUser.Id, createdUser.Username, createdUser.Email);
         }
 
-        public async Task<User> UpdateUser(User user, AbstractValidator<User> validator)
+        public async Task<UserUpdateResponse> UpdateUser(UserUpdateRequest userNewData)
         {
-            var userData = await validator.ValidateAsync(user);
-            if (!userData.IsValid) throw new ArgumentException("Dados inválidos, verifique o formulário e tente novamente.");
+            var user = await userRepository.GetById(userNewData.UserId) 
+                ?? throw new NotFoundInTheDatabaseExeption("Registro não encontrado");
+            user.Username = userNewData.Username ?? user.Username;
+            user.Email =  userNewData.Email ?? user.Email;
+            user.Phone =  userNewData.Phone ?? user.Phone;
             var updatedUser = await userRepository.Update(user);
-            return updatedUser;
+            return new UserUpdateResponse(
+                updatedUser.Id,
+                updatedUser.Username,
+                updatedUser.Email,
+                updatedUser.Phone
+                );
         }
 
         public async void DeleteUser(Guid id)
