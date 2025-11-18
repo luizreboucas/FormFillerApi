@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace FormFiller.Domain.Entities
 {
-    public class Schema: IEntity
+    public class Schema : IEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public List<Generator> Generators { get; set; }
+        public Guid UserId { get; set; }
     }
 }

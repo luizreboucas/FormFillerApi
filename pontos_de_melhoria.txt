@@ -1,0 +1,119 @@
+Análise de Pontos de Melhoria para o Projeto FormFiller
+======================================================
+
+Embora a estrutura atual do projeto seja excelente e siga corretamente os princípios da Arquitetura Limpa, existem práticas e padrões adicionais que podem ser adotados para elevar ainda mais a qualidade, manutenibilidade e escalabilidade da aplicação.
+
+---
+
+### 1. Adotar o Padrão CQRS com MediatR na Camada de Aplicação
+
+Atualmente, a classe `UserUseCases.cs` pode crescer e acumular muitas responsabilidades, misturando operações de escrita (Comandos) e leitura (Consultas).
+
+**Melhoria:** Separar explicitamente essas operações usando o padrão **CQRS (Command Query Responsibility Segregation)** com o auxílio da biblioteca **MediatR**.
+
+- **Command:** Uma operação que altera o estado do sistema (ex: `CreateUser`, `UpdateUser`).
+- **Query:** Uma operação que lê o estado do sistema sem modificá-lo (ex: `GetUserById`, `GetAllUsers`).
+
+**Como funciona:**
+Em vez de uma classe de serviço genérica, você cria classes pequenas e focadas para cada ação.
+
+```csharp
+// Exemplo de Comando
+public class CreateUserCommand : IRequest<UserCreateResponse>
+{
+    // propriedades do comando...
+}
+
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserCreateResponse>
+{
+    public Task<UserCreateResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    {
+        // Lógica para criar o usuário...
+        // ...chama o repositório, etc.
+    }
+}
+```
+
+**Vantagens:**
+- **Responsabilidade Única:** As classes se tornam menores e mais fáceis de entender.
+- **Manutenibilidade:** O código fica mais fácil de testar e manter.
+- **Otimização:** Permite otimizar separadamente as operações de leitura e escrita (ex: usar um banco de dados replicado e otimizado para leitura).
+
+---
+
+### 2. Enriquecer seu Modelo de Domínio (Rich Domain Model)
+
+As entidades de domínio (`User.cs`, `Schema.cs`) podem ser mais do que apenas contêineres de dados.
+
+**Melhoria:** Mover regras de negócio que são intrínsecas a uma entidade para dentro da própria classe da entidade. Isso protege as invariantes do negócio e centraliza a lógica.
+
+**Exemplo (Modelo "Rico"):**
+```csharp
+// Dentro da entidade User.cs
+public class User
+{
+    // ... propriedades
+    public void Deactivate()
+    {
+        if (!IsActive)
+        {
+            throw new InvalidOperationException("User is already inactive.");
+        }
+        this.IsActive = false;
+        this.DeactivationDate = DateTime.UtcNow;
+    }
+}
+
+// Na camada de Aplicação, o código fica mais simples e declarativo:
+var user = _userRepository.GetById(id);
+user.Deactivate(); // A lógica de negócio é chamada na própria entidade.
+_userRepository.Update(user);
+```
+
+**Vantagens:**
+- **Encapsulamento:** A lógica de negócio fica encapsulada e protegida.
+- **Reutilização e Confiança:** Evita a duplicação de regras e garante que o estado da entidade seja sempre válido.
+
+---
+
+### 3. Automatizar o Mapeamento (DTOs ↔ Modelos ↔ Entidades)
+
+O projeto possui diferentes modelos de dados em cada camada (DTOs, Request/Response Models, Entidades). Fazer a conversão manual entre eles é repetitivo.
+
+**Melhoria:** Usar uma biblioteca de mapeamento como o **AutoMapper**.
+
+Você define "perfis" de mapeamento uma vez, e a biblioteca cuida da conversão.
+
+```csharp
+// Exemplo de um Perfil de Mapeamento na camada de Aplicação
+public class UserProfile : Profile
+{
+    public UserProfile()
+    {
+        CreateMap<UserCreateDTO, UserCreateRequest>(); // Presentation -> Application
+        CreateMap<UserCreateRequest, User>();          // Application -> Domain
+        CreateMap<User, UserCreateResponseDTO>();      // Domain -> Presentation
+    }
+}
+
+// Uso no Controller ou Use Case:
+var request = _mapper.Map<UserCreateRequest>(userCreateDto);
+```
+
+**Vantagens:**
+- **Redução de Código:** Diminui drasticamente o código repetitivo de atribuição de propriedades.
+- **Manutenção Simplificada:** Centraliza a lógica de mapeamento em um único lugar.
+
+---
+
+### 4. Implementar um Tratamento Global de Exceções
+
+Em vez de usar blocos `try-catch` em cada action do controller, é possível centralizar o tratamento de erros.
+
+**Melhoria:** Criar um **Exception Handling Middleware** na camada de `Presentation`.
+
+Este middleware intercepta exceções que ocorrem durante uma requisição e as traduz para uma resposta HTTP apropriada (ex: `NotFoundInTheDatabaseExeption` -> `404 Not Found`).
+
+**Vantagens:**
+- **Código Limpo:** Remove a lógica de tratamento de erro dos controllers.
+- **Consistência:** Garante que os erros sejam tratados de forma uniforme em toda a API.

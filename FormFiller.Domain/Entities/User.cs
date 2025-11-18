@@ -14,5 +14,6 @@ namespace FormFiller.Domain.Entities
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string Phone { get; set; }
+        public List<Schema>? Schemas { get; set; }
     }
 }

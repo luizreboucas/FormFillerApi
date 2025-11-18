@@ -15,7 +15,7 @@ namespace FormFiller.Infrasctructure.Repositories
     public class UserRepository : IUserRepository
     {
         public ApplicationDbContext context;
- 
+
 
         public UserRepository(ApplicationDbContext _context)
         {
@@ -25,7 +25,7 @@ namespace FormFiller.Infrasctructure.Repositories
         {
             var newUser = await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
-            return  newUser.Entity;
+            return newUser.Entity;
         }
 
         public async void Delete(Guid id)

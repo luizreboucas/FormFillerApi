@@ -14,14 +14,14 @@ namespace FormFiller.Presentation.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UserController: ControllerBase
+    public class UserController : ControllerBase
     {
         public UserUseCases userUseCases;
         public UserCreateValidator userCreateValidator;
         public UserUpdateValidator userUpdateValidator;
         public UserController(
-            UserUseCases uc, 
-            UserCreateValidator _userCreateValidator, 
+            UserUseCases uc,
+            UserCreateValidator _userCreateValidator,
             UserUpdateValidator _userUpdateValidator
             )
         {
@@ -61,8 +61,8 @@ namespace FormFiller.Presentation.Controllers
                         userCreateDTO.Phone
                     ));
                     return Ok(new ApiResponse(
-                        true, 
-                        "Usuário criado com sucesso.", 
+                        true,
+                        "Usuário criado com sucesso.",
                         new UserCreateResponseDTO(newUser.Id, newUser.Username, newUser.Email)));
                 }
                 catch (Exception ex)
@@ -70,12 +70,12 @@ namespace FormFiller.Presentation.Controllers
                     return Problem(ex.Message);
                 }
             }
-            }
+        }
         [HttpPut("{id}")]
         public async Task<ActionResult<UserUpdateResponseDTO>> UpdateUser(Guid id, UserUpdateRequestDTO userNewData)
         {
             var validation = await userUpdateValidator.ValidateAsync(userNewData);
-            if(!validation.IsValid)
+            if (!validation.IsValid)
             {
                 return BadRequest(validation.Errors.Select(e => e.ErrorMessage));
             }
@@ -97,7 +97,35 @@ namespace FormFiller.Presentation.Controllers
                 return Ok(new ApiResponse(true, "Usuário atualizado com sucesso.", dto));
             }
             catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+        }
+
+        [HttpGet("/getByEmail/{email}")]
+        public async Task<ActionResult<UserDTO>> GetByEmail(string email)
         {
+            try
+            {
+                var user = await userUseCases.GetUserByEmail(email);
+                return new UserDTO(user.Id, user.Username, user.Email, user.Phone);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserDTO>> GetUserById(Guid id)
+        {
+            try
+            {
+                var user = await userUseCases.GetUserById(id);
+                return new UserDTO(user.Id, user.Username, user.Email, user.Phone);
+            }
+            catch (Exception ex)
+            {
                 return Problem(ex.Message);
             }
         }

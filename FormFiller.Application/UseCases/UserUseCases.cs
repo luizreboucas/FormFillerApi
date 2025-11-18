@@ -22,7 +22,7 @@ namespace FormFiller.Application.UseCases
         public async Task<UserCreateResponse> CreateUserUc(UserCreateRequest newUser)
         {
             var thisUserIsAlreadyInTheDb = await userRepository.GetByEmail(newUser.Email);
-            if(thisUserIsAlreadyInTheDb != null) throw new AlreadyInTheDatabase("Já existe um usuário cadastrado com esse email.");
+            if (thisUserIsAlreadyInTheDb != null) throw new AlreadyInTheDatabase("Já existe um usuário cadastrado com esse email.");
             var user = new User
             {
                 Username = newUser.Username,
@@ -36,11 +36,11 @@ namespace FormFiller.Application.UseCases
 
         public async Task<UserUpdateResponse> UpdateUser(UserUpdateRequest userNewData)
         {
-            var user = await userRepository.GetById(userNewData.UserId) 
+            var user = await userRepository.GetById(userNewData.UserId)
                 ?? throw new NotFoundInTheDatabaseExeption("Registro não encontrado");
             user.Username = userNewData.Username ?? user.Username;
-            user.Email =  userNewData.Email ?? user.Email;
-            user.Phone =  userNewData.Phone ?? user.Phone;
+            user.Email = userNewData.Email ?? user.Email;
+            user.Phone = userNewData.Phone ?? user.Phone;
             var updatedUser = await userRepository.Update(user);
             return new UserUpdateResponse(
                 updatedUser.Id,
@@ -65,6 +65,13 @@ namespace FormFiller.Application.UseCases
         public async Task<User> GetUserById(Guid id)
         {
             var user = await userRepository.GetById(id);
+            if (user == null) throw new NotFoundInTheDatabaseExeption("Registro não encontrado");
+            return user;
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            var user = await userRepository.GetByEmail(email);
             if (user == null) throw new NotFoundInTheDatabaseExeption("Registro não encontrado");
             return user;
         }

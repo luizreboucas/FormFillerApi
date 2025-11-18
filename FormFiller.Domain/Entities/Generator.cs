@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FormFiller.Domain.Entities
-{public class Generator: IEntity
+{
+    public class Generator : IEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public List<Param> Params { get; set; }
+        public List<Param>? Params { get; set; }
     }
 }
