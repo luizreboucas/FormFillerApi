@@ -30,6 +30,21 @@ public class SchemaRepository : ISchemaRepository
         return await context.Schemas.ToListAsync();
     }
 
+    public Task<List<Schema>> GetAllByName(string name)
+    {
+        return context.Schemas.Where(s => s.Name.Contains(name)).ToListAsync();
+    }
+
+    public async Task<List<Schema>> GetAllByUserId(Guid userId)
+    {
+        if (userId == Guid.Empty)
+        {
+            throw new ArgumentException("User ID cannot be empty", nameof(userId));
+        }
+        var schemas = await context.Schemas.Where(s => s.UserId == userId).ToListAsync();
+        return schemas;
+    }
+
     public Task<Schema?> GetById(Guid id)
     {
         throw new NotImplementedException();

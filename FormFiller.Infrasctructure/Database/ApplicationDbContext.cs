@@ -13,6 +13,8 @@ namespace FormFiller.Infrasctructure.Database
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Schema> Schemas { get; set; }
+        public DbSet<Generator> Generators { get; set; }
+        public DbSet<Param> Params { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }

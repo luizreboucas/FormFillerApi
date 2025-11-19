@@ -13,9 +13,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISchemaRepository, SchemaRepository>();
+builder.Services.AddScoped<IGeneratorRepository, GeneratorRepository>();
+builder.Services.AddScoped<IParamRepository, ParamRepository>();
 builder.Services.AddScoped<UserUseCases>();
+builder.Services.AddScoped<SchemaUseCases>();
+builder.Services.AddScoped<ParamUseCases>();
+builder.Services.AddScoped<GeneratorUseCases>();
+builder.Services.AddScoped<GeneratorRepository>();
 builder.Services.AddScoped<UserCreateValidator>();
 builder.Services.AddScoped<UserUpdateValidator>();
+builder.Services.AddScoped<SchemaCreateValidator>();
+builder.Services.AddScoped<ParamCreateValidator>();
 builder.Services.ConfigureDb(builder.Configuration);
 builder.Services.AddCors(options =>
 {

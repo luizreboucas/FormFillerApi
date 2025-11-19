@@ -10,10 +10,8 @@ public class SchemaCreateValidator : AbstractValidator<SchemaCreateDTO>
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Nome do schema é obrigatório.")
             .MinimumLength(3).WithMessage("O nome do schema deve ter no mínimo 3 caracteres.");
-        RuleFor(x => x.Generators)
-            .NotEmpty().WithMessage("Ao menos um generator é obrigatório.")
-            .Must(generators => generators != null && generators.Count > 0)
-            .WithMessage("Ao menos um generator é obrigatório.");
+        RuleFor(x => x.GeneratorsIds)
+            .NotEmpty().WithMessage("Ao menos um generator é obrigatório.");
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("UserId é obrigatório.");
     }

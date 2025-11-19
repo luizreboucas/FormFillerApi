@@ -3,6 +3,7 @@ using System;
 using FormFiller.Infrasctructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FormFiller.Infrasctructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251119123050_generators")]
+    partial class generators
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,7 +35,12 @@ namespace FormFiller.Infrasctructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("SchemaId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SchemaId");
 
                     b.ToTable("Generators");
                 });
@@ -54,7 +62,7 @@ namespace FormFiller.Infrasctructure.Migrations
 
                     b.HasIndex("GeneratorId");
 
-                    b.ToTable("Params");
+                    b.ToTable("Param");
                 });
 
             modelBuilder.Entity("FormFiller.Domain.Entities.Schema", b =>
@@ -104,19 +112,11 @@ namespace FormFiller.Infrasctructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GeneratorSchema", b =>
+            modelBuilder.Entity("FormFiller.Domain.Entities.Generator", b =>
                 {
-                    b.Property<Guid>("GeneratorsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SchemasId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("GeneratorsId", "SchemasId");
-
-                    b.HasIndex("SchemasId");
-
-                    b.ToTable("GeneratorSchema");
+                    b.HasOne("FormFiller.Domain.Entities.Schema", null)
+                        .WithMany("Generators")
+                        .HasForeignKey("SchemaId");
                 });
 
             modelBuilder.Entity("FormFiller.Domain.Entities.Param", b =>
@@ -139,24 +139,14 @@ namespace FormFiller.Infrasctructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GeneratorSchema", b =>
-                {
-                    b.HasOne("FormFiller.Domain.Entities.Generator", null)
-                        .WithMany()
-                        .HasForeignKey("GeneratorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FormFiller.Domain.Entities.Schema", null)
-                        .WithMany()
-                        .HasForeignKey("SchemasId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("FormFiller.Domain.Entities.Generator", b =>
                 {
                     b.Navigation("Params");
+                });
+
+            modelBuilder.Entity("FormFiller.Domain.Entities.Schema", b =>
+                {
+                    b.Navigation("Generators");
                 });
 
             modelBuilder.Entity("FormFiller.Domain.Entities.User", b =>

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FormFiller.Domain.Entities
@@ -11,6 +12,9 @@ namespace FormFiller.Domain.Entities
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public List<Param>? Params { get; set; }
+        [JsonIgnore]
+        public ICollection<Param>? Params { get; set; }
+        [JsonIgnore]
+        public ICollection<Schema> Schemas { get; set; } = new List<Schema>();
     }
 }
