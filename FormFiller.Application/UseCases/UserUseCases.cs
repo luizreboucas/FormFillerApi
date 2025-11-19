@@ -15,9 +15,11 @@ namespace FormFiller.Application.UseCases
     public class UserUseCases
     {
         private IUserRepository userRepository;
-        public UserUseCases(IUserRepository repository)
+        private IPasswordHasher passwordHasher;
+        public UserUseCases(IUserRepository repository, IPasswordHasher passwordHasher)
         {
             userRepository = repository;
+            this.passwordHasher = passwordHasher;
         }
         public async Task<UserCreateResponse> CreateUserUc(UserCreateRequest newUser)
         {
@@ -30,6 +32,8 @@ namespace FormFiller.Application.UseCases
                 PasswordHash = newUser.Password,
                 Phone = newUser.Phone
             };
+            var passwordHash = passwordHasher.HashPassword(user, user.PasswordHash);
+            user.PasswordHash = passwordHash;
             var createdUser = await userRepository.Create(user);
             return new UserCreateResponse(createdUser.Id, createdUser.Username, createdUser.Email);
         }

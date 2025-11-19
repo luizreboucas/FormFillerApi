@@ -1,8 +1,11 @@
 using FormFiller.Application.UseCases;
+using FormFiller.Domain.Entities;
 using FormFiller.Domain.Interfaces;
 using FormFiller.Infrasctructure.Repositories;
+using FormFiller.Infrasctructure.Utils;
 using FormFiller.Presentation;
 using FormFiller.Presentation.Validators;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +22,16 @@ builder.Services.AddScoped<IParamRepository, ParamRepository>();
 builder.Services.AddScoped<UserUseCases>();
 builder.Services.AddScoped<SchemaUseCases>();
 builder.Services.AddScoped<ParamUseCases>();
+builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<GeneratorUseCases>();
 builder.Services.AddScoped<GeneratorRepository>();
 builder.Services.AddScoped<UserCreateValidator>();
 builder.Services.AddScoped<UserUpdateValidator>();
 builder.Services.AddScoped<SchemaCreateValidator>();
 builder.Services.AddScoped<ParamCreateValidator>();
+builder.Services.AddScoped<LoginValidator>();
+builder.Services.AddScoped<PasswordHasher<User>>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasherImpl>();
 builder.Services.ConfigureDb(builder.Configuration);
 builder.Services.AddCors(options =>
 {
