@@ -5,6 +5,7 @@ using FormFiller.Presentation.DTOs.Schema;
 using FormFiller.Presentation.Validators;
 using Microsoft.AspNetCore.Mvc;
 using FormFiller.Application.UseCases.Models;
+using System.Threading.Tasks.Dataflow;
 
 namespace FormFiller.Presentation.Controllers;
 
@@ -49,12 +50,30 @@ public class SchemaController : ControllerBase
         try
         {
             var schemas = await schemaUseCases.GetSchemasByUserId(UserId);
-            if (schemas == null) return NotFound();
+            if (schemas == null || !schemas.Any()) return NotFound();
             return Ok(schemas);
         }
         catch
         {
             return Problem("Ocorreu um erro ao buscar os schemas");
+        }
+    }
+
+    [HttpPost("generate")]
+    public async Task<ActionResult> GenerateValues(GenerateRequestDTO request)
+    {
+        try
+        {
+            var result = await schemaUseCases.GenerateAll(request.paramsIds, request.schemaId);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(new GenerateResponseDTO(result.results));
+        }
+        catch (Exception ex)
+        {
+            return Problem("Ocorreu um erro ao gerar os valores: " + ex.Message);
         }
     }
 }

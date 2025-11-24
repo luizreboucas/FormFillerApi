@@ -12,7 +12,7 @@ public class SchemaUseCases
 {
     public ISchemaRepository schemaRepository;
     public IGeneratorRepository generatorRepository;
-    public List<IGen> concreteGenerators = new List<IGen
+    private readonly List<IGen> concreteGenerators = new List<IGen>
     {
         new CpfGenerator(),
         new CnpjGenerator(),
@@ -54,7 +54,7 @@ public class SchemaUseCases
         return await schemaRepository.GetAllByUserId(Id);
     }
 
-    public async Task<GeneratedResultsResponse> GenerateAll(List<Param> paramsList, Guid schemaId)
+    public async Task<GeneratedResultsResponse> GenerateAll(List<Guid>? paramsIds, Guid schemaId)
     {
         var result = new List<GeneratedResult>();
         var schema = await schemaRepository.GetById(schemaId);
