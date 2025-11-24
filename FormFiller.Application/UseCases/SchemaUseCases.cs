@@ -37,7 +37,7 @@ public class SchemaUseCases
             Generators = generators,
             UserId = request.UserId
         };
-        var schema = schemaRepository.Create(newSchema);
+        var schema = await schemaRepository.Create(newSchema);
         if (schema == null)
         {
             throw new Exception("Schema could not be created");

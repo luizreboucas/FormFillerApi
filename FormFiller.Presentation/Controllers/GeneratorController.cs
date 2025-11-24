@@ -16,7 +16,7 @@ public class GeneratorController : ControllerBase
         this.generatorUseCases = generatorUseCases;
     }
     [HttpPost]
-    public ActionResult<List<Generator>> GetGeneratorsByIdList(List<Guid> GeneratorsIds)
+    public async Task<ActionResult<List<Generator>>> GetGeneratorsByIdList(List<Guid> GeneratorsIds)
     {
         try
         {
@@ -24,14 +24,14 @@ public class GeneratorController : ControllerBase
             {
                 return BadRequest("Lista de IDs de geradores não pode ser nula ou vazia");
             }
-            var generators = generatorUseCases.GetAllByIdList(GeneratorsIds);
+            var generators = await generatorUseCases.GetAllByIdList(GeneratorsIds);
             if (generators == null)
             {
                 return NotFound("Nenhum gerador encontrado para os IDs fornecidos");
             }
             return Ok(generators);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return Problem(ex.Message);
         }
@@ -40,11 +40,11 @@ public class GeneratorController : ControllerBase
     public async Task<ActionResult<List<Generator>>> GetAll()
     {
         var generators = await generatorUseCases.GetAll();
-        if(generators == null)
+        if (generators == null)
         {
             return NotFound("Nenhum gerador encontrado");
         }
         return Ok(generators);
     }
-    
+
 }

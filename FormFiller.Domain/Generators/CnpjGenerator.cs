@@ -15,7 +15,7 @@ public class CnpjGenerator : IGen
         var middleDigits = rand.Next(9).ToString("D4");
         var firstValidatorDigit = CalculateValidatorDigit(firstEightNumbers + middleDigits).ToString("D1");
         var secondValidatorDigit = CalculateValidatorDigit(firstEightNumbers + middleDigits + firstValidatorDigit).ToString("D1");
-        var formattedFirstEigthNumbers = string.Join(".", firstEightNumbers.Substring(0, 2), firstEightNumbers.Substring(2, 5), firstEightNumbers.Substring(5));
+        var formattedFirstEigthNumbers = string.Join(".", firstEightNumbers.Substring(0, 2), firstEightNumbers.Substring(2, 3), firstEightNumbers.Substring(5, 3));
         return $"{formattedFirstEigthNumbers}/{middleDigits}-{firstValidatorDigit}{secondValidatorDigit}";
     }
 

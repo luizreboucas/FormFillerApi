@@ -45,9 +45,9 @@ public class SchemaRepository : ISchemaRepository
         return schemas;
     }
 
-    public Task<Schema?> GetById(Guid id)
+    public async Task<Schema?> GetById(Guid id)
     {
-        throw new NotImplementedException();
+        return await context.Schemas.Include(s => s.Generators).FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public Task<Schema> Update(Schema entity)
