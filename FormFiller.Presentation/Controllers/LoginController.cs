@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using FormFiller.Application.UseCases;
 using FormFiller.Application.UseCases.Models;
 using FormFiller.Presentation.DTOs.User;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FormFiller.Presentation.Controllers
 {
     [ApiController]
     [Route("login")]
-    public class LoginController: ControllerBase
+    public class LoginController : ControllerBase
     {
         public LoginValidator validator;
         public LoginUseCase loginUseCase;
@@ -24,24 +26,28 @@ namespace FormFiller.Presentation.Controllers
         public async Task<ActionResult<LoginResponseDTO>> Login(LoginRequestDTO request)
         {
             var validation = await validator.ValidateAsync(request);
-            if(!validation.IsValid)
+            if (!validation.IsValid)
             {
                 return BadRequest(validation.Errors);
             }
-            try 
+            try
             {
                 var result = await loginUseCase.LoginExec(new LoginRequest(request.Email, request.Password));
-                if(result == null)
+                if (result == null)
                 {
                     return Unauthorized("Credenciais inválidas");
                 }
-                var userDto = new UserDTO(
-                    result.Id,
-                    result.Username,
-                    result.Email,
-                    result.Phone
+                var claimsPrincipal = new ClaimsPrincipal(
+                    new ClaimsIdentity(
+                        new[]
+                        {
+                            new Claim(ClaimTypes.Name, result.Username),
+                            new Claim(ClaimTypes.NameIdentifier, result.Id.ToString())
+                        },
+                        JwtBearerDefaults.AuthenticationScheme
+                    )
                 );
-                return Ok(new LoginResponseDTO(userDto));
+                return SignIn(claimsPrincipal);
             }
             catch (Exception ex)
             {

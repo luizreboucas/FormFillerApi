@@ -9,11 +9,13 @@ using FormFiller.Presentation.Validators;
 using FormFiller.Application.UseCases.Models;
 using System.Security.Cryptography.X509Certificates;
 using FormFiller.Presentation.DTOs.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FormFiller.Presentation.Controllers
 {
     [ApiController]
     [Route("users")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         public UserUseCases userUseCases;
