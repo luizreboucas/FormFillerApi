@@ -27,7 +27,7 @@ public class SchemaRepository : ISchemaRepository
 
     public async Task<List<Schema>> GetAll()
     {
-        return await context.Schemas.ToListAsync();
+        return await context.Schemas.Include(s => s.Generators).ToListAsync();
     }
 
     public Task<List<Schema>> GetAllByName(string name)
@@ -41,7 +41,7 @@ public class SchemaRepository : ISchemaRepository
         {
             throw new ArgumentException("User ID cannot be empty", nameof(userId));
         }
-        var schemas = await context.Schemas.Where(s => s.UserId == userId).ToListAsync();
+        var schemas = await context.Schemas.Where(s => s.UserId == userId).Include(s => s.Generators).ToListAsync();
         return schemas;
     }
 

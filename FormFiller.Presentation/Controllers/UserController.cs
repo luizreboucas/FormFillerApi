@@ -15,7 +15,6 @@ namespace FormFiller.Presentation.Controllers
 {
     [ApiController]
     [Route("users")]
-    [Authorize]
     public class UserController : ControllerBase
     {
         public UserUseCases userUseCases;
@@ -33,6 +32,7 @@ namespace FormFiller.Presentation.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
             try
@@ -74,6 +74,7 @@ namespace FormFiller.Presentation.Controllers
             }
         }
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserUpdateResponseDTO>> UpdateUser(Guid id, UserUpdateRequestDTO userNewData)
         {
             var validation = await userUpdateValidator.ValidateAsync(userNewData);
@@ -105,6 +106,7 @@ namespace FormFiller.Presentation.Controllers
         }
 
         [HttpGet("/getByEmail/{email}")]
+        [Authorize]
         public async Task<ActionResult<UserDTO>> GetByEmail(string email)
         {
             try
@@ -119,6 +121,7 @@ namespace FormFiller.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserDTO>> GetUserById(Guid id)
         {
             try
